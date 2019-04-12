@@ -1,3 +1,5 @@
+const threshold = 0.5; //controller axis threshold
+
 //set up Three.js
 let scene;
 let camera;
@@ -8,15 +10,39 @@ let loaders;
 
 let clock = new THREE.Clock();
 
+let drone;
+
 init();
 animate();
+
+function cameraControlCallback(gamepad) {
+  if(drone) {
+    drone.accel.z = sign(gamepad.axes[1]);
+    drone.accel.x = sign(gamepad.axes[0]);
+    drone.accel.y = sign(gamepad.buttons[5].value) - sign(gamepad.buttons[4].value)
+
+    drone.angularVel.x = -sign(gamepad.axes[3]);
+    drone.angularVel.y = -sign(gamepad.axes[2]);
+
+  }
+}
+
+function sign(buttonValue) {
+  if(Math.abs(buttonValue) < threshold) {
+    return 0;
+  } else if(buttonValue > 0) {
+    return 1;
+  } else if(buttonValue < 0) {
+    return -1;
+  }
+}
 
 function init() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   renderer = new THREE.WebGLRenderer({antialias: true});
 
-  controls = new THREE.GamepadControls(camera);
+  controls = new THREE.DroneGamepadControls(cameraControlCallback);
 
   loader = new THREE.GLTFLoader();
 
@@ -27,8 +53,11 @@ function init() {
 
   camera.position.z = 5;
 
+
+  drone = new Drone(camera);
+
   //add light
-  const light = new THREE.PointLight(0xFFFFFF, 1, 500);
+  const light = new THREE.PointLight(0xFFFFFF, 1, 0); //white, intensity of 1, no distance limit
   light.position.set(0, 15, 25);
   scene.add(light);
 
@@ -37,17 +66,16 @@ function init() {
 
 
   //add test sphere
-  // const geometry = new THREE.SphereGeometry();
-  // const material = new THREE.MeshLambertMaterial({color: 0xFF00FF});
-  // const mesh = new THREE.Mesh(geometry, material);
-  // scene.add(mesh);
+  const geometry = new THREE.SphereGeometry();
+  const material = new THREE.MeshLambertMaterial({color: 0xFF00FF});
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
 
 
   //load iss
   loader.load('./assets/scene.gltf', gltf => {
-    console.log(gltf.scene);
-    gltf.scene.scale.set(0.1, 0.1, 0.1);
-    gltf.scene.position.set(0, 5, -5);
+    gltf.scene.scale.set(10, 10, 10);
+    gltf.scene.position.set(0, 500, -500);
     gltf.scene.rotation.set(Math.PI, Math.PI/2, 0);
     scene.add(gltf.scene);
   });
@@ -71,6 +99,7 @@ function render() {
   let delta = clock.getDelta();
 
   //controls.update(delta);
+  drone.render();
 
   renderer.render(scene, camera);
 }
