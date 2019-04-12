@@ -24,6 +24,15 @@ function cameraControlCallback(gamepad) {
     drone.angularVel.x = -sign(gamepad.axes[3]);
     drone.angularVel.y = -sign(gamepad.axes[2]);
 
+
+    if(gamepad.buttons[9].value === 1.0){ //start button freeze in place
+      drone.accel = new THREE.Vector3(0, 0, 0);
+      drone.vel = new THREE.Vector3(0, 0, 0);
+    }
+
+    if(gamepad.buttons[8].value === 1.0){ //start button freeze in place
+      console.log(camera.matrix)
+    }
   }
 }
 
@@ -50,9 +59,6 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   //renderer.setClearColor('#222222');
   $('body').append(renderer.domElement);
-
-  camera.position.z = 5;
-
 
   drone = new Drone(camera);
 

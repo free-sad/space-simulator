@@ -12,6 +12,8 @@ class Drone {
 
     this.angularVel = new THREE.Vector3(0, 0, 0);
     this.angularAccel = new THREE.Vector3(0, 0, 0);
+
+    this.lookat = new THREE.Vector3(0, 0, -1);
   }
 
   render(delta) {
@@ -43,11 +45,34 @@ class Drone {
     //create transformation matrix
     let matrix = new THREE.Matrix4();
 
-    matrix.makeRotationFromEuler(rotationEuler);
-    matrix.setPosition(position);
+    //matrix.makeRotationFromEuler(rotationEuler);
+    //matrix.lookAt(this.camera.position, rotation, new THREE.Vector3(0, 0, 1));
+    //position.applyMatrix4(matrix);
+    //matrix.setPosition(position);
 
     //apply transformations
-    camera.applyMatrix(matrix);
+    //this.camera.applyMatrix(matrix);
+
+    camera.position.add(position);
+    //camera.rotation.add(rotation);
+    camera.rotation.y += rotation.y;
+    camera.rotation.x += rotation.x
+    camera.rotation.z += rotation.z;
+
+
+    console.log(this.camera.rotation)
+
+
+    // this.lookat.add(rotation);
+    //
+    // this.camera.lookAt(this.lookat);
+
+    //position.applyMatrix4(this.camera.matrix);
+
+    //camera.position.add(position);
     //mesh.applyMatrix(matrix);
+
+    //camera.lookAt(rotation);
+
   }
 }
