@@ -7,18 +7,27 @@ class Drone {
     //this.mesh = mesh;
     this.rotation = new THREE.Matrix4();
 
-    //velocity and acceleration
+    //controller input (local x,y,z)
+    this.control = new THREE.Vector3();
+
+    //initial velocity and acceleration
     this.vel = new THREE.Vector3(0, 0, 0);
     this.accel = new THREE.Vector3(0, 0, 0);
 
     this.angularVel = new THREE.Vector3(0, 0, 0);
 
     this.light = light;
+
+    this.gov = false;
   }
 
   render(delta) {
     let position = new THREE.Vector3();
     let rotation = new THREE.Vector3();
+
+    //rotate control vector to world grid
+    this.accel.copy(this.control);
+    this.accel.applyQuaternion(this.camera.quaternion);
 
     //integrate
     this.vel.add(this.accel);
@@ -41,8 +50,9 @@ class Drone {
     this.camera.position.add(position);
 
     //increment camera's rotation
-    camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotation.y);
     camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), rotation.x);
+    camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotation.y);
+    camera.rotateOnAxis(new THREE.Vector3(0, 0, 1), rotation.z);
 
     this.light.position.copy(this.camera.position)
   }

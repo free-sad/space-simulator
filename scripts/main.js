@@ -18,17 +18,18 @@ animate();
 function cameraControlCallback(gamepad) {
   if(drone) {
     let x = sign(gamepad.axes[0]);
-    let y = sign(gamepad.buttons[5].value) - sign(gamepad.buttons[4].value);
+    let y = sign(gamepad.buttons[7].value) - sign(gamepad.buttons[6].value);
     let z = sign(gamepad.axes[1]);
 
-    drone.accel.x = x;
-    drone.accel.y = y;
-    drone.accel.z = z;
+    if(drone.gov) {
+      // if(drone.vel)
+    } else {
+      drone.control.set(x, y, z);
+    }
 
-    drone.accel.applyQuaternion(drone.camera.quaternion)
-
-    drone.angularVel.x = -sign(gamepad.axes[3])
+    drone.angularVel.x = -sign(gamepad.axes[3]);
     drone.angularVel.y = -sign(gamepad.axes[2]);
+    drone.angularVel.z = -sign(gamepad.buttons[5].value) + sign(gamepad.buttons[4].value)
 
 
     if(gamepad.buttons[9].value === 1.0){ //reset
