@@ -18,7 +18,8 @@ class Drone {
 
     this.light = light;
 
-    this.gov = false;
+    this.gov = true;
+    this.maxSpeed = 100;
   }
 
   render(delta) {

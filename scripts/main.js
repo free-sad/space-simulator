@@ -21,8 +21,30 @@ function cameraControlCallback(gamepad) {
     let y = sign(gamepad.buttons[7].value) - sign(gamepad.buttons[6].value);
     let z = sign(gamepad.axes[1]);
 
+    let control = new THREE.Vector3(
+      sign(gamepad.axes[0]),
+      sign(gamepad.buttons[7].value) - sign(gamepad.buttons[6].value),
+      sign(gamepad.axes[1])
+    );
+
+    console.log(drone.vel.clone().negate().normalize())
+
     if(drone.gov) {
-      // if(drone.vel)
+      if(control.length() > 0) { //controller input
+        console.log(drone.vel.length())
+        if(drone.vel.length() < drone.maxSpeed) {
+          drone.control.copy(control);
+          console.log('copied')
+        } else {
+          drone.control.set(0, 0, 0)
+        }
+      } else {
+        console.log(control.length())
+
+        if(drone.vel.length() > 1) {
+          drone.control.copy(drone.vel.clone().applyQuaternion(drone.camera.quaternion).negate().normalize());
+        }
+      }
     } else {
       drone.control.set(x, y, z);
     }
@@ -40,8 +62,9 @@ function cameraControlCallback(gamepad) {
     }
 
     if(gamepad.buttons[8].value === 1.0){ //back button
-      drone.accel = new THREE.Vector3(0, 0, 0);
-      drone.vel = new THREE.Vector3(0, 0, 0);
+      // drone.accel = new THREE.Vector3(0, 0, 0);
+      // drone.vel = new THREE.Vector3(0, 0, 0);
+      drone.gov = !drone.gov;
     }
   }
 }
