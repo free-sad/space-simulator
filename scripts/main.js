@@ -27,32 +27,46 @@ function cameraControlCallback(gamepad) {
       sign(gamepad.axes[1])
     );
 
-    console.log(drone.vel.clone().negate().normalize())
 
-    if(drone.gov) {
-      if(control.length() > 0) { //controller input
-        console.log(drone.vel.length())
+    if(drone.gov) { //if governor is enabled
+      if(control.length() > 0) { //if controller is inputting a speed
         if(drone.vel.length() < drone.maxSpeed) {
           drone.control.copy(control);
-          console.log('copied')
         } else {
           drone.control.set(0, 0, 0)
         }
-      } else {
-        console.log(control.length())
+      } else { //else (joysticks set to 0)
 
-        if(drone.vel.length() > 1) {
-          drone.control.copy(drone.vel.clone().applyQuaternion(drone.camera.quaternion).negate().normalize());
+        //if this axis has velocity,
+        if(Math.abs(drone.vel.x) > 0.5) {
+          //apply thruster in the reverse direction
+          drone.control.x = - Math.sign(drone.vel.x)
+        } else {
+          //else turn off thruster
+          drone.control.x = 0
+        }
+
+        if(Math.abs(drone.vel.y) > 0.5) {
+          drone.control.y = - Math.sign(drone.vel.y)
+        } else {
+          drone.control.y = 0
+        }
+
+        if(Math.abs(drone.vel.z) > 0.5) {
+          drone.control.z = - Math.sign(drone.vel.z)
+        } else {
+          drone.control.z = 0
         }
       }
     } else {
+      //otherwise have the controller directly control the thrusters
       drone.control.set(x, y, z);
     }
 
+    //set rotation with right joystick and bumpers
     drone.angularVel.x = -sign(gamepad.axes[3]);
     drone.angularVel.y = -sign(gamepad.axes[2]);
     drone.angularVel.z = -sign(gamepad.buttons[5].value) + sign(gamepad.buttons[4].value)
-
 
     if(gamepad.buttons[9].value === 1.0){ //reset
       drone.accel = new THREE.Vector3(0, 0, 0);

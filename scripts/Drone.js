@@ -19,16 +19,13 @@ class Drone {
     this.light = light;
 
     this.gov = true;
-    this.maxSpeed = 100;
+    this.maxSpeed = 50;
   }
 
   render(delta) {
-    let position = new THREE.Vector3();
-    let rotation = new THREE.Vector3();
-
     //rotate control vector to world grid
     this.accel.copy(this.control);
-    this.accel.applyQuaternion(this.camera.quaternion);
+    //this.accel.applyQuaternion(this.camera.quaternion);
 
     //integrate
     this.vel.add(this.accel);
@@ -43,17 +40,15 @@ class Drone {
     deltaPosition.multiplyScalar(mul);
     deltaRotation.multiplyScalar(mul);
 
-    //add deltas
-    position.add(deltaPosition);
-    rotation.add(deltaRotation);
+    deltaPosition.applyQuaternion(this.camera.quaternion);
 
     //increment camera's position
-    this.camera.position.add(position);
+    this.camera.position.add(deltaPosition);
 
     //increment camera's rotation
-    camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), rotation.x);
-    camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotation.y);
-    camera.rotateOnAxis(new THREE.Vector3(0, 0, 1), rotation.z);
+    camera.rotateOnAxis(new THREE.Vector3(1, 0, 0), deltaRotation.x);
+    camera.rotateOnAxis(new THREE.Vector3(0, 1, 0), deltaRotation.y);
+    camera.rotateOnAxis(new THREE.Vector3(0, 0, 1), deltaRotation.z);
 
     this.light.position.copy(this.camera.position)
   }
