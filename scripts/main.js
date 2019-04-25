@@ -17,10 +17,6 @@ animate();
 
 function cameraControlCallback(gamepad) {
   if(drone) {
-    let x = sign(gamepad.axes[0]);
-    let y = sign(gamepad.buttons[7].value) - sign(gamepad.buttons[6].value);
-    let z = sign(gamepad.axes[1]);
-
     let control = new THREE.Vector3(
       sign(gamepad.axes[0]),
       sign(gamepad.buttons[7].value) - sign(gamepad.buttons[6].value),
@@ -33,29 +29,29 @@ function cameraControlCallback(gamepad) {
         if(drone.vel.length() < drone.maxSpeed) {
           drone.control.copy(control);
         } else {
-          drone.control.set(0, 0, 0)
+          drone.control.set(0, 0, 0);
         }
       } else { //else (joysticks set to 0)
 
         //if this axis has velocity,
         if(Math.abs(drone.vel.x) > 0.5) {
           //apply thruster in the reverse direction
-          drone.control.x = - Math.sign(drone.vel.x)
+          drone.control.x = - Math.sign(drone.vel.x);
         } else {
           //else turn off thruster
-          drone.control.x = 0
+          drone.control.x = 0;
         }
 
         if(Math.abs(drone.vel.y) > 0.5) {
-          drone.control.y = - Math.sign(drone.vel.y)
+          drone.control.y = - Math.sign(drone.vel.y);
         } else {
-          drone.control.y = 0
+          drone.control.y = 0;
         }
 
         if(Math.abs(drone.vel.z) > 0.5) {
-          drone.control.z = - Math.sign(drone.vel.z)
+          drone.control.z = - Math.sign(drone.vel.z);
         } else {
-          drone.control.z = 0
+          drone.control.z = 0;
         }
       }
     } else {
