@@ -1,5 +1,23 @@
 const threshold = 0.5; //controller axis threshold
 
+//Drone connection
+const droneURL = 'ws://192.168.1.108:81';
+let ws;
+let sendStateInterval;
+let tryWebSocketConnectionTimeout;
+let closeWebSocketWatchDog;
+let gameState = {
+  controller: {
+    x: 0,
+    y: 0,
+    z: 0
+  },
+  state: {
+    governor: false
+  }
+};
+
+
 //set up Three.js
 let scene;
 let camera;
@@ -12,8 +30,60 @@ let clock = new THREE.Clock();
 
 let drone;
 
+initWebSocket();
+
 init();
 animate();
+
+function initWebSocket(){
+  tryWebSocketConnectionTimeout = null;
+
+  ws = new WebSocket(droneURL);
+
+  ws.addEventListener('open', event => {
+    $('#connection-status').text('connected');
+    $('#connection-status').css('color', 'green');
+
+    //send web socket every 100ms
+    sendStateInterval = setInterval(sendState, 100);
+  });
+
+  ws.addEventListener('error', event => {
+    $('#connection-status').text('disconnected');
+    $('#connection-status').css('color', 'red');
+  });
+
+  ws.addEventListener('message', event => {
+    //kick the watchdog every time we get a message back from the drone
+    if(event.data === "ACK") {
+      clearTimeout(closeWebSocketWatchDog);
+      closeWebSocketWatchDog = setTimeout(closeWebSocket, 5000); //closing the websocket will start the reconnection process
+    }
+  });
+}
+
+function sendState() {
+  if(ws.readyState === WebSocket.OPEN) {
+    //send if the socket is open
+    ws.send(JSON.stringify(gameState));
+  } else if(ws.readyState === WebSocket.CLOSED) {
+    //if the socket is closed, re-init the connection in a second
+    $('#connection-status').text('disconnected');
+    $('#connection-status').css('color', 'red');
+
+    if(!tryWebSocketConnectionTimeout) {
+      console.error('web socket disconnected, trying to reconnect');
+      tryWebSocketConnectionTimeout = setTimeout(initWebSocket, 1000);
+    }
+  }
+}
+
+function closeWebSocket() {
+  ws.close();
+
+  $('#connection-status').text('disconnected');
+  $('#connection-status').css('color', 'red');
+}
 
 function cameraControlCallback(gamepad) {
   if(drone) {
@@ -22,6 +92,10 @@ function cameraControlCallback(gamepad) {
       sign(gamepad.buttons[7].value) - sign(gamepad.buttons[6].value),
       sign(gamepad.axes[1])
     );
+
+    gameState.controller.x = sign(gamepad.axes[0]);
+    gameState.controller.y = sign(gamepad.buttons[7].value) - sign(gamepad.buttons[6].value);
+    gameState.controller.z = sign(gamepad.axes[1]);
 
 
     if(drone.gov) { //if governor is enabled
@@ -56,7 +130,7 @@ function cameraControlCallback(gamepad) {
       }
     } else {
       //otherwise have the controller directly control the thrusters
-      drone.control.set(x, y, z);
+      drone.control.copy(control);
     }
 
     //set rotation with right joystick and bumpers
@@ -147,6 +221,7 @@ function animate() {
   requestAnimationFrame(animate);
 
   render();
+  updateHUD();
 }
 
 function render() {
@@ -157,3 +232,12 @@ function render() {
 
   renderer.render(scene, camera);
 }
+
+function updateHUD() { //update velocity/etc html elements
+  const x = (drone.vel.x / 10).toFixed().toString().padStart(3);
+  const y = (drone.vel.y / 10).toFixed().toString().padStart(3);
+  const z = (drone.vel.z / -10).toFixed().toString().padStart(3); //flip z direction to be more intuitive to the user
+
+  const velString = `x: ${x} y: ${y} z: ${z}`;
+  $('#velocity').text(velString)
+};

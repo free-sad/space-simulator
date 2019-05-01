@@ -18,7 +18,7 @@ class Drone {
 
     this.light = light;
 
-    this.gov = true;
+    this.gov = false;
     this.maxSpeed = 50;
   }
 

@@ -9,6 +9,10 @@
     <link rel="stylesheet" type="text/css" href="index.css">
   </head>
   <body>
+    <div id="overlay">
+      <p>Drone status: <span id="connection-status">disconnected</span></p>
+      <p>Velocity: <span id="velocity">x:   0.0, y:   0.0, z:   0.0</span></p>
+    </div>
     <script src="https://code.jquery.com/jquery-3.4.0.min.js" integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/103/three.min.js"></script>
     <script src="./scripts/Drone.js"></script>

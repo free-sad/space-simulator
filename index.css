@@ -1,3 +1,22 @@
+#overlay {
+  font-size: 24px;
+  font-family: monospace;
+  position: absolute;
+  display: block;
+  color: white;
+  right: 25px;
+  bottom: 25px;
+  margin: 0;
+}
+
+#connection-status {
+  color: red;
+}
+
+#velocity {
+  white-space: pre;
+}
+
 body {
   margin: 0;
   height: 100vh;
