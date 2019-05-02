@@ -1,7 +1,7 @@
 const mul = 0.01;
 
 class Drone {
-  constructor(camera, light, arm) {
+  constructor(camera, light, leftarm, rightarm) {
     //camera and mesh
     this.camera = camera;
     //this.mesh = mesh;
@@ -21,7 +21,8 @@ class Drone {
     this.gov = false;
     this.maxSpeed = 50;
 
-    this.arm = arm;
+    this.leftarm = leftarm;
+    this.rightarm = rightarm;
   }
 
   render(delta) {
@@ -53,9 +54,10 @@ class Drone {
     camera.rotateOnAxis(new THREE.Vector3(0, 0, 1), deltaRotation.z);
 
     this.light.position.copy(this.camera.position);
-    this.arm.position.copy(this.camera.position);
-    this.arm.quaternion.copy(this.camera.quaternion);
-
+    this.leftarm.position.copy(this.camera.position);
+    this.leftarm.quaternion.copy(this.camera.quaternion);
+    this.rightarm.position.copy(this.camera.position);
+    this.rightarm.quaternion.copy(this.camera.quaternion);
 
 
     // this.arm.rotateOnAxis(new THREE.Vector3(1, 0, 0), 0.0*Math.PI)

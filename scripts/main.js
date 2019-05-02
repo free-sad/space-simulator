@@ -180,13 +180,17 @@ function init() {
     console.log(glb);
 
     scene.add(glb.scene);
-    arm = glb.scene;
+    leftarm = glb.scene;
+    rightarm = leftarm.clone()
+    rightarm.scale.x = -1
+
+    scene.add(rightarm);
 
     //arm.applyMatrix(new THREE.Matrix4().makeTranslation(1, -1, -10));
 
 
     const droneLight = new THREE.PointLight(0xCCCCCC, 0.5, 25);
-    drone = new Drone(camera, droneLight, arm);
+    drone = new Drone(camera, droneLight, leftarm, rightarm);
     scene.add(droneLight);
   });
 
