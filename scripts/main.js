@@ -1,7 +1,7 @@
 const threshold = 0.5; //controller axis threshold
 
 //Drone connection
-const droneURL = 'ws://192.168.1.108:81';
+const droneURL = 'ws://192.168.43.14:81';
 let ws;
 let sendStateInterval;
 let tryWebSocketConnectionTimeout;
@@ -146,9 +146,18 @@ function cameraControlCallback(gamepad) {
     }
 
     if(gamepad.buttons[8].value === 1.0){ //back button
-      // drone.accel = new THREE.Vector3(0, 0, 0);
-      // drone.vel = new THREE.Vector3(0, 0, 0);
-      drone.gov = !drone.gov;
+      drone.accel = new THREE.Vector3(0, 0, 0);
+      drone.vel = new THREE.Vector3(0, 0, 0);
+    }
+
+    if(gamepad.buttons[12].value === 1.0) {
+      drone.gov = true;
+      gameState.state.governor = true;
+    }
+
+    if(gamepad.buttons[13].value === 1.0) {
+      drone.gov = false;
+      gameState.state.governor = false;
     }
   }
 }
@@ -203,13 +212,6 @@ function init() {
   scene.add(ambient);
 
 
-  //add test sphere
-  const geometry = new THREE.SphereGeometry();
-  const material = new THREE.MeshPhongMaterial({color: 0xFF00FF});
-  const mesh = new THREE.Mesh(geometry, material);
-  scene.add(mesh);
-
-
   //load iss
   loader.load('./assets/scene.gltf', gltf => {
     gltf.scene.scale.set(10, 10, 10);
@@ -257,5 +259,7 @@ function updateHUD() { //update velocity/etc html elements
 
     const velString = `x: ${x} y: ${y} z: ${z}`;
     $('#velocity').text(velString)
+
+    $('#mode').text(`${drone.gov ? "Auto" : "Free"}`);
   }
 };
