@@ -176,9 +176,19 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   $('body').append(renderer.domElement);
 
-  const droneLight = new THREE.PointLight(0xCCCCCC, 0.5, 25);
-  drone = new Drone(camera, droneLight);
-  scene.add(droneLight);
+  loader.load('./assets/roboarm2.glb', glb => {
+    console.log(glb);
+
+    scene.add(glb.scene);
+    arm = glb.scene;
+
+    //arm.applyMatrix(new THREE.Matrix4().makeTranslation(1, -1, -10));
+
+
+    const droneLight = new THREE.PointLight(0xCCCCCC, 0.5, 25);
+    drone = new Drone(camera, droneLight, arm);
+    scene.add(droneLight);
+  });
 
   //add light
   const light = new THREE.PointLight(0xFFFFFF, 1, 0); //white, intensity of 1, no distance limit
@@ -228,16 +238,20 @@ function render() {
   let delta = clock.getDelta();
 
   //controls.update(delta);
-  drone.render();
+  if(drone) {
+    drone.render();
+  }
 
   renderer.render(scene, camera);
 }
 
 function updateHUD() { //update velocity/etc html elements
-  const x = (drone.vel.x / 10).toFixed().toString().padStart(3);
-  const y = (drone.vel.y / 10).toFixed().toString().padStart(3);
-  const z = (drone.vel.z / -10).toFixed().toString().padStart(3); //flip z direction to be more intuitive to the user
+  if(drone) {
+    const x = (drone.vel.x / 10).toFixed().toString().padStart(3);
+    const y = (drone.vel.y / 10).toFixed().toString().padStart(3);
+    const z = (drone.vel.z / -10).toFixed().toString().padStart(3); //flip z direction to be more intuitive to the user
 
-  const velString = `x: ${x} y: ${y} z: ${z}`;
-  $('#velocity').text(velString)
+    const velString = `x: ${x} y: ${y} z: ${z}`;
+    $('#velocity').text(velString)
+  }
 };
